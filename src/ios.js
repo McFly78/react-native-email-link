@@ -40,7 +40,8 @@ const titles = {
  *  - airmail: https://help.airmailapp.com/en-us/article/airmail-ios-url-scheme-1q060gy/
  *  - outlook: https://stackoverflow.com/questions/32369198/i-just-want-to-open-ms-outlook-app-and-see-mailto-screen-using-url-scheme-at-ios
  *  - fastmail: https://github.com/vtourraine/ThirdPartyMailer/blob/1.8.0/Sources/ThirdPartyMailer/ThirdPartyMailClient.swift#L80
- */
+ *  - protonmail: https://github.com/ProtonMail/ios-mail/issues/27  //MODIFICATION NM FOR PROTONMAIL
+*/
 const uriParams = {
   "apple-mail": {
     cc: "cc",
@@ -115,9 +116,21 @@ const uriParams = {
     subject: "subject",
     body: "body",
   },
+
+  // MODIFICATION NM FOR PROTONMAIL
+  /*
   protonmail: {
     path: "compose",
   },
+  */
+  protonmail: {
+    //path: "compose",
+    to: "mailto",
+    subject: "subject",
+    body: "body",
+  },
+  // MODIFICATION END NM FOR PROTONMAIL
+
   seznamemail: {
     path: "mail",
   },
@@ -140,7 +153,11 @@ function getUrlParams(app, options) {
     return "";
   }
 
-  const path = app === "apple-mail" ? options.to || "" : appParms.path;
+  // MODIFICATION NM FOR PROTONMAIL
+  // const path = (app === "apple-mail") ? options.to || "" : appParms.path;
+  const path = ((app === "apple-mail") || app === "protonmail" ) ? options.to || "" : appParms.path;
+  // MODIFICATION END NM FOR PROTONMAIL
+  
   const urlParams = Object.keys(appParms).reduce((params, currentParam) => {
     if (options[currentParam]) {
       params.push(`${appParms[currentParam]}=${options[currentParam]}`);
@@ -149,6 +166,7 @@ function getUrlParams(app, options) {
   }, []);
 
   return `${path}?${urlParams.join("&")}`;
+
 }
 
 /**
@@ -330,10 +348,18 @@ export async function openComposer(options) {
   const params = getUrlParams(app, options);
   let prefix = prefixes[app];
 
-  if (app === "apple-mail") {
+  if (app === "apple-mail"){
     // apple mail prefix to compose an email is mailto
     prefix = "mailto:";
+  } 
+  // ADD NM FOR PROTONMAIL
+  else {
+    if (app === "protonmail"){
+      // apple mail prefix to compose an email is mailto
+      prefix = "protonmail://mailto:";
+    }
   }
+  // END ADD NM FOR PROTONMAIL
 
   await Linking.openURL(`${prefix}${params}`);
   return { app, title: titles[app] };
