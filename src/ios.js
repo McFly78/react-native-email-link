@@ -336,7 +336,7 @@ export async function openInbox(options = {}) {
  */
 export async function openComposer(options) {
   const app = await getApp(options, "compose");
-
+  console.log ("toto")
   if (!app) {
     return null;
   }
@@ -344,6 +344,17 @@ export async function openComposer(options) {
   if (options.encodeBody) {
     options.body = encodeURIComponent(options.body);
   }
+
+  // 18/09/2023 NM ajout pour rajouter une option pour encoder également le subject (idem que pour le body)
+  // Obligé de rajouter un encoding depuis que j'ai upgradé en RN0.71.13 et passé sous Xcode 15
+  // ils en parlent ici:
+  // le PR n'a pas encore été mergé dans le module initial
+  // https://github.com/includable/react-native-email-link/issues/118
+  // https://github.com/includable/react-native-email-link/pull/125
+  if (options.encodeSubject) {
+    options.subject = encodeURIComponent(options.subject);
+  }
+  // Fin modif NM
 
   const params = getUrlParams(app, options);
   let prefix = prefixes[app];
