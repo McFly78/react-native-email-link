@@ -336,7 +336,6 @@ export async function openInbox(options = {}) {
  */
 export async function openComposer(options) {
   const app = await getApp(options, "compose");
-  console.log ("toto")
   if (!app) {
     return null;
   }
